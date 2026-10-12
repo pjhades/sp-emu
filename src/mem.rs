@@ -799,13 +799,12 @@ impl Bus {
     /// The lowest-numbered enabled+pending IRQ (priority-aware delivery is gated
     /// by the CPU via `irq_prio`). Returns the IRQ number, not the vector.
     pub fn next_irq(&self) -> Option<u16> {
-        for i in 0..8 {
-            let active = self.nvic_en[i] & self.nvic_pend[i];
-            if active != 0 {
-                return Some((i as u16) * 32 + active.trailing_zeros() as u16);
-            }
+        if self.nvic_active == 0 {
+            return None;
         }
-        None
+        let i = self.nvic_active.trailing_zeros() as usize;
+        let active = self.nvic_en[i] & self.nvic_pend[i];
+        Some((i as u16) * 32 + active.trailing_zeros() as u16)
     }
 
     pub fn irq_prio(&self, irq: u16) -> u8 {
