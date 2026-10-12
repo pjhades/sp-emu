@@ -64,6 +64,8 @@ pub struct Bus {
     // NVIC state (IRQ 0..255): enable + pending bitmaps, and per-IRQ priority.
     nvic_en: [u32; 8],
     nvic_pend: [u32; 8],
+    // XXX(pjhades) comment
+    nvic_active: u8,
     nvic_prio: [u8; 256],
     // PendSV pending bit (SCB ICSR.PENDSVSET): the kernel pends this to defer a
     // context switch out of SysTick/interrupt handlers.
@@ -224,6 +226,7 @@ impl Bus {
             writes: Vec::new(),
             nvic_en: [0; 8],
             nvic_pend: [0; 8],
+            nvic_active: 0,
             nvic_prio: [0; 256],
             pend_pendsv: false,
             dev_touched: false,
